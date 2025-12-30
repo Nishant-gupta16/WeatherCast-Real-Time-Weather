@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WeatherCast | Real-Time Weather</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://img.icons8.com/color/96/000000/partly-cloudy-day.png">
+    <meta name="theme-color" content="#4361ee">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <!-- Floating Action Button for Mobile -->
+    <button class="fab" id="fab-menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Mobile Side Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="menu-header">
+            <h3><i class="fas fa-cloud-sun"></i> WeatherCast</h3>
+            <button class="close-menu" id="close-menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="menu-items">
+            <a href="#" class="menu-item active" data-section="current">
+                <i class="fas fa-sun"></i>
+                <span>Current Weather</span>
+            </a>
+            <a href="#" class="menu-item" data-section="forecast">
+                <i class="fas fa-calendar-day"></i>
+                <span>5-Day Forecast</span>
+            </a>
+            <a href="#" class="menu-item" data-section="air">
+                <i class="fas fa-wind"></i>
+                <span>Air Quality</span>
+            </a>
+            <a href="#" class="menu-item" data-section="hourly">
+                <i class="fas fa-clock"></i>
+                <span>Hourly Forecast</span>
+            </a>
+            <a href="#" class="menu-item" data-section="sun">
+                <i class="fas fa-sun"></i>
+                <span>Sun Times</span>
+            </a>
+            <a href="#" class="menu-item" data-section="details">
+                <i class="fas fa-info-circle"></i>
+                <span>Weather Details</span>
+            </a>
+            <a href="#" class="menu-item" data-section="map">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Location Map</span>
+            </a>
+            <!-- Additional Features -->
+           
+        </div>
+        <div class="menu-footer">
+            <div class="theme-toggle">
+                <i class="fas fa-moon"></i>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <i class="fas fa-sun"></i>
+            </div>
+            <div class="app-version">v3.0.1</div>
+            <div class="app-status">
+                <i class="fas fa-wifi"></i>
+                <span>Online</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Top Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-cloud-sun-rain"></i>
+                    <span class="logo-text">Weather<span>Cast</span></span>
+                </div>
+                <div class="location-badge" id="location-badge">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="current-location">Mumbai, IN</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="time-display" id="time-display">
+                    <i class="far fa-clock"></i>
+                    <span>14:30</span>
+                </div>
+                <div class="weather-status" id="weather-status">
+                    <i class="fas fa-cloud-sun"></i>
+                    <span>28°C</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="city-search" 
+                        placeholder="Search city or location..." 
+                        autocomplete="off"
+                    >
+                    <button class="voice-search" id="voice-search" title="Voice Search">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                <div class="search-actions">
+                    <button class="btn-current-location" id="btn-current-location">
+                        <i class="fas fa-location-arrow"></i>
+                        <span>Current</span>
+                    </button>
+                    <button class="btn-refresh" id="btn-refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Cities -->
+            <div class="quick-cities">
+                <button class="quick-city" data-city="Mumbai">
+                    <i class="fas fa-city"></i>
+                    <span>Mumbai</span>
+                </button>
+                <button class="quick-city" data-city="Delhi">
+                    <i class="fas fa-landmark"></i>
+                    <span>Delhi</span>
+                </button>
+                <button class="quick-city" data-city="Bangalore">
+                    <i class="fas fa-tree-city"></i>
+                    <span>Bangalore</span>
+                </button>
+                <button class="quick-city" data-city="London">
+                    <i class="fas fa-umbrella"></i>
+                    <span>London</span>
+                </button>
+                <button class="quick-city" data-city="New York">
+                    <i class="fas fa-building"></i>
+                    <span>NYC</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Current Weather Card -->
+            <section class="current-weather-section" id="current-section">
+                <div class="weather-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-sun"></i> Current Weather</h2>
+                        <div class="unit-toggle">
+                            <button class="unit-btn active" data-unit="celsius">°C</button>
+                            <button class="unit-btn" data-unit="fahrenheit">°F</button>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-main-display">
+                        <div class="temperature-display">
+                            <div class="temp-value" id="temp-value">28</div>
+                            <div class="temp-unit">°C</div>
+                        </div>
+                        <div class="weather-info">
+                            <div class="weather-icon-large">
+                                <img src="https://openweathermap.org/img/wn/02d@2x.png" alt="Partly Cloudy" id="weather-icon-large">
+                            </div>
+                            <div class="weather-description" id="weather-desc">Partly Cloudy</div>
+                            <div class="feels-like">Feels like <span id="feels-like-temp">30</span>°C</div>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-stats">
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-label">Wind</div>
+                                <div class="stat-value" id="wind-speed">3.6 m/s</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-droplet"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-label">Humidity</div>
+                                <div class="stat-value" id="humidity">65%</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-gauge-high"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-label">Pressure</div>
+                                <div class="stat-value" id="pressure">1013 hPa</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-label">Visibility</div>
+                                <div class="stat-value" id="visibility">10 km</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5-Day Forecast -->
+            <section class="forecast-section" id="forecast-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-day"></i> 5-Day Forecast</h2>
+                    <button class="view-all" id="view-forecast">View All</button>
+                </div>
+                <div class="forecast-cards" id="forecast-cards">
+                    <!-- Forecast cards will be generated here -->
+                </div>
+            </section>
+
+            <!-- Air Quality -->
+            <section class="air-quality-section" id="air-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-wind"></i> Air Quality Index</h2>
+                    <div class="aqi-badge" id="aqi-badge">
+                        <span class="aqi-value">3</span>
+                        <span class="aqi-label">Moderate</span>
+                    </div>
+                </div>
+                <div class="air-quality-card">
+                    <div class="aqi-meter">
+                        <div class="aqi-scale">
+                            <div class="scale-item good">Good</div>
+                            <div class="scale-item moderate">Moderate</div>
+                            <div class="scale-item unhealthy">Unhealthy</div>
+                            <div class="scale-item very-unhealthy">Very Unhealthy</div>
+                            <div class="scale-item hazardous">Hazardous</div>
+                        </div>
+                        <div class="aqi-indicator" id="aqi-indicator"></div>
+                    </div>
+                    <div class="pollutants-grid">
+                        <div class="pollutant-item">
+                            <div class="pollutant-name">PM2.5</div>
+                            <div class="pollutant-value" id="pm25-value">25.3 µg/m³</div>
+                            <div class="pollutant-bar">
+                                <div class="pollutant-fill" id="pm25-fill"></div>
+                            </div>
+                        </div>
+                        <div class="pollutant-item">
+                            <div class="pollutant-name">PM10</div>
+                            <div class="pollutant-value" id="pm10-value">42.7 µg/m³</div>
+                            <div class="pollutant-bar">
+                                <div class="pollutant-fill" id="pm10-fill"></div>
+                            </div>
+                        </div>
+                        <div class="pollutant-item">
+                            <div class="pollutant-name">O₃</div>
+                            <div class="pollutant-value" id="o3-value">18.5 µg/m³</div>
+                            <div class="pollutant-bar">
+                                <div class="pollutant-fill" id="o3-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hourly Forecast -->
+            <section class="hourly-section" id="hourly-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-clock"></i> Hourly Forecast</h2>
+                </div>
+                <div class="hourly-scroll" id="hourly-scroll">
+                    <!-- Hourly items will be generated here -->
+                </div>
+            </section>
+
+            <!-- Sun Times & Details -->
+            <section class="details-section">
+                <div class="details-grid">
+                    <!-- Sun Times -->
+                    <div class="detail-card" id="sun-section">
+                        <div class="detail-header">
+                            <i class="fas fa-sun"></i>
+                            <h3>Sun Times</h3>
+                        </div>
+                        <div class="detail-content">
+                            <div class="sun-time-item">
+                                <div class="sun-time-icon sunrise">
+                                    <i class="fas fa-sunrise"></i>
+                                </div>
+                                <div class="sun-time-info">
+                                    <div class="sun-time-label">Sunrise</div>
+                                    <div class="sun-time-value" id="sunrise-time">06:45 AM</div>
+                                </div>
+                            </div>
+                            <div class="sun-time-item">
+                                <div class="sun-time-icon sunset">
+                                    <i class="fas fa-sunset"></i>
+                                </div>
+                                <div class="sun-time-info">
+                                    <div class="sun-time-label">Sunset</div>
+                                    <div class="sun-time-value" id="sunset-time">06:30 PM</div>
+                                </div>
+                            </div>
+                            <div class="day-length">
+                                <i class="far fa-clock"></i>
+                                <span>Day Length: <strong id="day-length-value">11h 45m</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Details -->
+                    <div class="detail-card" id="details-section">
+                        <div class="detail-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>Weather Details</h3>
+                        </div>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <div class="detail-label">
+                                    <i class="fas fa-cloud"></i>
+                                    <span>Cloudiness</span>
+                                </div>
+                                <div class="detail-value" id="cloudiness-value">40%</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">
+                                    <i class="fas fa-temperature-high"></i>
+                                    <span>Dew Point</span>
+                                </div>
+                                <div class="detail-value" id="dew-point">21°C</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">
+                                    <i class="fas fa-umbrella"></i>
+                                    <span>Rain Volume</span>
+                                </div>
+                                <div class="detail-value" id="rain-volume">0 mm</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">
+                                    <i class="fas fa-snowflake"></i>
+                                    <span>Snow Volume</span>
+                                </div>
+                                <div class="detail-value" id="snow-volume">0 mm</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Location Map -->
+            <section class="map-section" id="map-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-map-marked-alt"></i> Location Map</h2>
+                </div>
+                <div class="map-card">
+                    <div class="map-placeholder" id="map-placeholder">
+                        <div class="map-overlay" id="map-overlay">
+                            <i class="fas fa-globe-asia"></i>
+                            <h3 id="map-location">Mumbai, India</h3>
+                            <p id="map-coordinates">19.07°N, 72.87°E</p>
+                            <button class="btn-view-map" id="btn-view-map">
+                                <i class="fas fa-external-link-alt"></i>
+                                Open in Maps
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+          
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-section="current">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item" data-section="forecast">
+                <i class="fas fa-chart-line"></i>
+                <span>Forecast</span>
+            </a>
+            <a href="#" class="nav-item" data-section="air">
+                <i class="fas fa-wind"></i>
+                <span>Air Quality</span>
+            </a>
+            <a href="#" class="nav-item" data-section="map">
+                <i class="fas fa-map"></i>
+                <span>Map</span>
+            </a>
+           
+        </nav>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast-container" id="toast-container">
+        <div class="toast" id="toast">
+            <i class="fas fa-check-circle toast-icon"></i>
+            <span class="toast-message" id="toast-message">Weather updated successfully</span>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading Weather Data...</div>
+            <div class="loading-subtext">Please wait</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
