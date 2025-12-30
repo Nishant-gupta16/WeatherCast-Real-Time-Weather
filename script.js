@@ -1,13 +1,7 @@
-// ===========================================
-// WEATHER APP - ULTRA MODERN & RESPONSIVE
-// ===========================================
-
-// Configuration
 const API_KEY = '6d2d85099d5fffc5344fdb0bff628af0';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5';
 const GEO_URL = 'https://api.openweathermap.org/geo/1.0';
 
-// Mock Data for Offline with coordinates
 const MOCK_DATA = {
     'Mumbai': {
         temp: 28,
@@ -126,7 +120,6 @@ const MOCK_DATA = {
     }
 };
 
-// DOM Elements
 const elements = {
     citySearch: document.getElementById('city-search'),
     searchBtn: document.querySelector('.search-box'),
@@ -134,7 +127,6 @@ const elements = {
     currentLocationBtn: document.getElementById('btn-current-location'),
     refreshBtn: document.getElementById('btn-refresh'),
     quickCities: document.querySelectorAll('.quick-city'),
-    
     locationBadge: document.getElementById('current-location'),
     weatherStatus: document.querySelector('.weather-status span'),
     tempValue: document.getElementById('temp-value'),
@@ -146,9 +138,7 @@ const elements = {
     pressure: document.getElementById('pressure'),
     visibility: document.getElementById('visibility'),
     unitBtns: document.querySelectorAll('.unit-btn'),
-    
     forecastCards: document.getElementById('forecast-cards'),
-    
     aqiBadge: document.getElementById('aqi-badge'),
     aqiIndicator: document.getElementById('aqi-indicator'),
     pm25Value: document.getElementById('pm25-value'),
@@ -157,28 +147,21 @@ const elements = {
     pm25Fill: document.getElementById('pm25-fill'),
     pm10Fill: document.getElementById('pm10-fill'),
     o3Fill: document.getElementById('o3-fill'),
-    
     sunriseTime: document.getElementById('sunrise-time'),
     sunsetTime: document.getElementById('sunset-time'),
     dayLength: document.getElementById('day-length-value'),
-    
     cloudiness: document.getElementById('cloudiness-value'),
     dewPoint: document.getElementById('dew-point'),
     rainVolume: document.getElementById('rain-volume'),
     snowVolume: document.getElementById('snow-volume'),
-    
     hourlyScroll: document.getElementById('hourly-scroll'),
-    
     mapLocation: document.getElementById('map-location'),
     mapCoordinates: document.getElementById('map-coordinates'),
-    
     timeDisplay: document.querySelector('#time-display span'),
-    
     toast: document.getElementById('toast'),
     toastMessage: document.getElementById('toast-message'),
     loadingOverlay: document.getElementById('loading-overlay'),
     themeToggle: document.getElementById('theme-toggle'),
-    
     fabMenu: document.getElementById('fab-menu'),
     mobileMenu: document.getElementById('mobile-menu'),
     closeMenu: document.getElementById('close-menu'),
@@ -186,7 +169,6 @@ const elements = {
     navItems: document.querySelectorAll('.nav-item')
 };
 
-// App State
 const state = {
     currentCity: 'Mumbai',
     currentUnit: 'celsius',
@@ -196,7 +178,6 @@ const state = {
     currentCoords: { lat: 19.0760, lon: 72.8777 }
 };
 
-// Initialize App
 function initApp() {
     console.log('🚀 Weather App Initialized');
     
@@ -210,15 +191,11 @@ function initApp() {
     }, 500);
     
     setupEventListeners();
-    
     setupNetworkListeners();
-    
     generateForecastCards();
-    
     generateHourlyForecast();
 }
 
-// Update Time
 function updateTime() {
     const now = new Date();
     const time = now.toLocaleTimeString([], { 
@@ -230,7 +207,6 @@ function updateTime() {
     elements.timeDisplay.textContent = time;
 }
 
-// Setup Event Listeners
 function setupEventListeners() {
     elements.citySearch.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -274,13 +250,23 @@ function setupEventListeners() {
         });
     });
     
-    document.getElementById('btn-view-map')?.addEventListener('click', () => {
-        const { lat, lon } = state.currentCoords;
-        window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
+    const viewMapBtn = document.getElementById('btn-view-map');
+    if (viewMapBtn) {
+        viewMapBtn.addEventListener('click', () => {
+            const { lat, lon } = state.currentCoords;
+            window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
+        });
+    }
+    
+    elements.fabMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMobileMenu();
     });
     
-    elements.fabMenu.addEventListener('click', toggleMobileMenu);
-    elements.closeMenu.addEventListener('click', toggleMobileMenu);
+    elements.closeMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMobileMenu();
+    });
     
     elements.menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -288,6 +274,19 @@ function setupEventListeners() {
             const section = item.dataset.section;
             scrollToSection(section);
             toggleMobileMenu();
+            
+            elements.menuItems.forEach(menuItem => {
+                menuItem.classList.remove('active');
+            });
+            item.classList.add('active');
+            
+            elements.navItems.forEach(navItem => {
+                if (navItem.dataset.section === section) {
+                    navItem.classList.add('active');
+                } else {
+                    navItem.classList.remove('active');
+                }
+            });
         });
     });
     
@@ -298,6 +297,14 @@ function setupEventListeners() {
             
             elements.navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
+            
+            elements.menuItems.forEach(menuItem => {
+                if (menuItem.dataset.section === section) {
+                    menuItem.classList.add('active');
+                } else {
+                    menuItem.classList.remove('active');
+                }
+            });
             
             if (section === 'more') {
                 toggleMobileMenu();
@@ -312,21 +319,28 @@ function setupEventListeners() {
     
     elements.themeToggle.addEventListener('change', toggleTheme);
     
-    document.getElementById('view-forecast')?.addEventListener('click', () => {
-        scrollToSection('forecast');
-    });
+    const viewForecastBtn = document.getElementById('view-forecast');
+    if (viewForecastBtn) {
+        viewForecastBtn.addEventListener('click', () => {
+            scrollToSection('forecast');
+        });
+    }
     
     document.addEventListener('click', (e) => {
         if (elements.mobileMenu.classList.contains('open') && 
             !elements.mobileMenu.contains(e.target) && 
-            !elements.fabMenu.contains(e.target) && 
-            !Array.from(elements.navItems).some(item => item.contains(e.target))) {
+            !elements.fabMenu.contains(e.target)) {
+            toggleMobileMenu();
+        }
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && elements.mobileMenu.classList.contains('open')) {
             toggleMobileMenu();
         }
     });
 }
 
-// Setup Network Listeners
 function setupNetworkListeners() {
     window.addEventListener('online', () => {
         state.isOnline = true;
@@ -342,7 +356,6 @@ function setupNetworkListeners() {
     });
 }
 
-// Handle Search
 function handleSearch() {
     const city = elements.citySearch.value.trim();
     if (city) {
@@ -354,7 +367,6 @@ function handleSearch() {
     }
 }
 
-// Get Current Location
 function getCurrentLocation() {
     if (!navigator.geolocation) {
         showToast('Geolocation not supported', 'warning');
@@ -403,7 +415,6 @@ function getCurrentLocation() {
     );
 }
 
-// Load Weather Data
 async function loadWeatherData(city) {
     showLoading();
     state.currentCity = city;
@@ -426,7 +437,6 @@ async function loadWeatherData(city) {
     }
 }
 
-// Fetch Real Weather Data
 async function fetchRealWeatherData(city) {
     try {
         const geoResponse = await fetch(
@@ -462,7 +472,6 @@ async function fetchRealWeatherData(city) {
     }
 }
 
-// Update UI with Real Data
 function updateUIWithRealData(data, cityName, country) {
     elements.locationBadge.textContent = `${cityName}, ${country}`;
     
@@ -516,7 +525,6 @@ function updateUIWithRealData(data, cityName, country) {
     updateAQIWithMockData(cityName);
 }
 
-// Update UI with Mock Data
 function updateUIWithMockData(city) {
     const data = MOCK_DATA[city] || MOCK_DATA['Mumbai'];
     
@@ -550,7 +558,6 @@ function updateUIWithMockData(city) {
     updateMap(city, data.country, data.lat, data.lon);
 }
 
-// Update AQI with Mock Data
 function updateAQIWithMockData(city) {
     const data = MOCK_DATA[city] || MOCK_DATA['Mumbai'];
     
@@ -579,7 +586,6 @@ function updateAQIWithMockData(city) {
     elements.o3Fill.style.width = `${Math.min(data.o3 / 50 * 100, 100)}%`;
 }
 
-// Update Map
 function updateMap(city, country, lat, lon) {
     const latDir = lat >= 0 ? 'N' : 'S';
     const lonDir = lon >= 0 ? 'E' : 'W';
@@ -590,12 +596,13 @@ function updateMap(city, country, lat, lon) {
     elements.mapCoordinates.textContent = `${latAbs}°${latDir}, ${lonAbs}°${lonDir}`;
     
     const mapBtn = document.getElementById('btn-view-map');
-    mapBtn.onclick = () => {
-        window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
-    };
+    if (mapBtn) {
+        mapBtn.onclick = () => {
+            window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
+        };
+    }
 }
 
-// Generate Forecast Cards
 function generateForecastCards() {
     const forecastDays = ['Today', 'Tomorrow', 'Wed', 'Thu', 'Fri'];
     const icons = ['02d', '03d', '10d', '01d', '02d'];
@@ -619,7 +626,6 @@ function generateForecastCards() {
     });
 }
 
-// Generate Hourly Forecast
 function generateHourlyForecast() {
     const hours = ['Now', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM'];
     const temps = [28, 29, 30, 31, 30, 29, 28, 27];
@@ -641,7 +647,6 @@ function generateHourlyForecast() {
     });
 }
 
-// Calculate Dew Point
 function calculateDewPoint(temp, humidity) {
     const a = 17.27;
     const b = 237.7;
@@ -649,7 +654,6 @@ function calculateDewPoint(temp, humidity) {
     return (b * alpha) / (a - alpha);
 }
 
-// Update Unit Buttons
 function updateUnitButtons() {
     elements.unitBtns.forEach(btn => {
         if (btn.dataset.unit === state.currentUnit) {
@@ -662,23 +666,30 @@ function updateUnitButtons() {
     document.querySelector('.temp-unit').textContent = state.currentUnit === 'celsius' ? '°C' : '°F';
 }
 
-// Toggle Mobile Menu
 function toggleMobileMenu() {
-    elements.mobileMenu.classList.toggle('open');
-    elements.fabMenu.innerHTML = elements.mobileMenu.classList.contains('open') 
-        ? '<i class="fas fa-times"></i>' 
-        : '<i class="fas fa-bars"></i>';
-}
-
-// Scroll to Section
-function scrollToSection(sectionId) {
-    const section = document.getElementById(`${sectionId}-section`);
-    if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
+    const isOpen = elements.mobileMenu.classList.contains('open');
+    
+    if (isOpen) {
+        elements.mobileMenu.classList.remove('open');
+        elements.fabMenu.innerHTML = '<i class="fas fa-bars"></i>';
+        elements.fabMenu.style.transform = 'rotate(0deg)';
+    } else {
+        elements.mobileMenu.classList.add('open');
+        elements.fabMenu.innerHTML = '<i class="fas fa-times"></i>';
+        elements.fabMenu.style.transform = 'rotate(90deg)';
     }
 }
 
-// Set Theme
+function scrollToSection(sectionId) {
+    const section = document.getElementById(`${sectionId}-section`);
+    if (section) {
+        section.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
 function setTheme(theme) {
     state.theme = theme;
     document.documentElement.setAttribute('data-theme', theme);
@@ -686,14 +697,12 @@ function setTheme(theme) {
     elements.themeToggle.checked = theme === 'dark';
 }
 
-// Toggle Theme
 function toggleTheme() {
     const newTheme = state.theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     showToast(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode activated`);
 }
 
-// Show Toast
 function showToast(message, type = 'success') {
     const icon = type === 'error' ? 'fa-exclamation-circle' : 
                  type === 'warning' ? 'fa-exclamation-triangle' : 
@@ -719,17 +728,14 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Show Loading
 function showLoading() {
     elements.loadingOverlay.classList.add('active');
 }
 
-// Hide Loading
 function hideLoading() {
     elements.loadingOverlay.classList.remove('active');
 }
 
-// Initialize on DOM load
 document.addEventListener('DOMContentLoaded', initApp);
 
 if ('serviceWorker' in navigator) {
