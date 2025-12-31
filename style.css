@@ -180,6 +180,7 @@ body {
 .search-box {
     flex: 1;
     position: relative;
+   
 }
 
 .search-box input {
@@ -207,26 +208,32 @@ body {
     transform: translateY(-50%);
     color: var(--text-tertiary);
     pointer-events: none;
+    z-index: -4;
 }
 
-.voice-search {
+.search-button {
     position: absolute;
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background: var(--primary);
     border: none;
-    color: var(--text-secondary);
+    color: white;
     font-size: 1rem;
     cursor: pointer;
     padding: 8px;
     border-radius: 50%;
     transition: all var(--transition-fast);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.voice-search:hover {
-    background: var(--bg-tertiary);
-    color: var(--primary);
+.search-button:hover {
+    background: var(--secondary);
+    transform: translateY(-50%) scale(1.1);
 }
 
 .search-actions {
@@ -981,7 +988,7 @@ body {
 .mobile-menu {
     position: fixed;
     top: 0;
-    right: -300px;  /* Menu off-screen initially */
+    right: -300px;
     width: 300px;
     height: 100%;
     background: var(--bg-card);
@@ -996,7 +1003,7 @@ body {
 }
 
 .mobile-menu.open {
-    right: 0;  /* Slide in when open class is added */
+    right: 0;
 }
 
 .menu-header {
@@ -1035,6 +1042,7 @@ body {
 .close-menu:hover {
     background: rgba(255, 255, 255, 0.2);
 }
+
 .menu-items {
     flex: 1;
     overflow-y: auto;
@@ -1059,7 +1067,6 @@ body {
 .menu-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: var(--space-md);
     padding: 14px var(--space-xl);
     color: var(--text-secondary);
@@ -1088,50 +1095,6 @@ body {
     font-weight: 500;
 }
 
-.menu-divider {
-    height: 1px;
-    background: var(--border-color);
-    margin: var(--space-md) var(--space-xl);
-}
-
-.badge {
-    background: var(--accent);
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-    min-width: 20px;
-    text-align: center;
-}
-
-/* Premium Features Styling in Menu */
-.menu-item.premium {
-    background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(247, 37, 133, 0.1));
-    border-left-color: var(--accent);
-    margin: var(--space-xs) var(--space-xl);
-    border-radius: var(--radius-md);
-}
-
-.menu-item.premium i {
-    color: var(--accent);
-}
-
-.menu-item.premium:hover {
-    background: linear-gradient(135deg, rgba(67, 97, 238, 0.2), rgba(247, 37, 133, 0.2));
-}
-
-.menu-section-title {
-    padding: var(--space-sm) var(--space-xl);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: var(--space-md);
-}
-
-/* Menu Footer */
 .menu-footer {
     padding: var(--space-lg);
     border-top: 1px solid var(--border-color);
@@ -1205,13 +1168,6 @@ input:checked + .slider {
 
 input:checked + .slider:before {
     transform: translateX(26px);
-}
-
-.menu-footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: var(--space-md);
 }
 
 .app-version {
@@ -1428,10 +1384,6 @@ input:checked + .slider:before {
     .menu-item {
         padding: 12px var(--space-lg);
     }
-    
-    .menu-divider {
-        margin: var(--space-sm) var(--space-lg);
-    }
 }
 
 /* Small Mobile */
@@ -1535,11 +1487,6 @@ input:checked + .slider:before {
     
     .menu-item i {
         font-size: 1rem;
-    }
-    
-    .badge {
-        font-size: 0.7rem;
-        padding: 1px 6px;
     }
 }
 
