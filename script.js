@@ -37,7 +37,7 @@ const MOCK_DATA = {
         icon: '01d',
         sunrise: '06:40',
         sunset: '18:20',
-        aqi: 2,
+        aqi: 4,
         pm25: 18.7,
         pm10: 35.2,
         o3: 15.8,
@@ -123,7 +123,7 @@ const MOCK_DATA = {
 const elements = {
     citySearch: document.getElementById('city-search'),
     searchBtn: document.querySelector('.search-box'),
-    voiceSearch: document.getElementById('voice-search'),
+    searchButton: document.getElementById('search-button'),
     currentLocationBtn: document.getElementById('btn-current-location'),
     refreshBtn: document.getElementById('btn-refresh'),
     quickCities: document.querySelectorAll('.quick-city'),
@@ -221,8 +221,9 @@ function setupEventListeners() {
         handleSearch();
     });
     
-    elements.voiceSearch.addEventListener('click', () => {
-        showToast('Voice search coming soon!');
+    elements.searchButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleSearch();
     });
     
     elements.currentLocationBtn.addEventListener('click', getCurrentLocation);
